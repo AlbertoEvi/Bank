@@ -4,202 +4,177 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankProyect
+namespace Bank2
 {
-    public interface IAccount//metodos necesarios en cada cuenta
+    #region Interfaces
+
+    public interface IAccount
     {
-        void PayInFunds(decimal amount);
+        bool IsValidName();
+        bool IsValidBalance();
+
+        bool PayInFunds(decimal amount);
         bool WithdrawFunds(decimal amount);
-        decimal GetBalance();
-        string GetName();
 
-        bool SetBalance(decimal balance);
-        bool SetName(string name);
-
-        string ValidateName(string name);
-        string ValidateBalance(decimal balance);
-
-        void EditName(CustomerAccount account);
-        void EditBalance(CustomerAccount account);
-
+        void DoEdit();
     }
-    public class CustomerAccount : IAccount //cuenta cliente normal
+    #endregion
+    #region Accounts
+
+    public class CustomerAccount : IAccount
     {
-        private string name;
-        private decimal balance = 0;
+        private string _name;
+        private decimal _balance;
 
-        public CustomerAccount(string newName, decimal initialBalance)//constructor de cuenta de cliente
+        #region Constructors 
+
+        public CustomerAccount(string newName, decimal initialBalance)
         {
-            name = newName;
-            balance = initialBalance;
+            _name = newName;
+            _balance = initialBalance;
         }
 
-        public virtual bool WithdrawFunds(decimal amount)//sacar fondos
+        #endregion
+
+        #region Properties
+
+        public string Name
         {
-            if (balance < amount)
+            set
             {
-                return false;
+                if (IsValidName())
+                    this._name = value;
             }
-            balance -= amount;
-            Console.WriteLine(balance);
+            get
+            {
+                return _name;
+            }
+        }
+
+        public decimal Balance
+        {
+            set
+            {
+                if (IsValidBalance())
+                    this._balance = value;
+            }
+            get
+            {
+                return _balance;
+            }
+        }
+
+        #endregion
+
+        #region Validations
+
+        public bool IsValidName()
+        {
+            if (String.IsNullOrWhiteSpace(Name))
+                return false;
+
             return true;
         }
 
-        public void PayInFunds(decimal amount)//ingresar dinero
+        public bool IsValidBalance()
         {
-            balance += amount;
-            Console.WriteLine(balance);
-        }
-
-        public decimal GetBalance()//obtener saldo
-        {
-            return balance;
-        }
-
-        public string GetName()//obtener nombre 
-        {
-            return name;
-        }
-
-        public bool SetName(string Iname)//establecer nombre
-        {
-            string reply = ValidateName(Iname);
-            if (reply.Length < 0)
-            {
+            if (String.IsNullOrWhiteSpace(Balance.ToString()))
                 return false;
-            }
-            this.name = Iname.Trim();
+
             return true;
         }
 
-        public bool SetBalance(decimal balance)//establecer saldo
+        #endregion
+
+        #region BalanceOperations
+
+        public virtual bool WithdrawFunds(decimal amount)
         {
-            string reply = ValidateBalance(balance);
-            if (reply.Length < 0)
+            if (Balance < amount)
             {
                 return false;
             }
-            this.balance = balance;
+            Balance -= amount;
+            Console.WriteLine(Balance);
             return true;
         }
 
-        public string ValidateName(string name)//validar nombre
+        public bool PayInFunds(decimal amount)
         {
-            if (name == null) {
-                return "Name parameter null";
-            }
-            string trimmedName = name.Trim();
-            if (trimmedName.Length == 0) {
-                return "No text in the name";
-            }
-            return "";
-        }
-
-        public string ValidateBalance(decimal balance)//validar saldo
-        {
-            if (balance.ToString() == null){
-                return "Balance parameter null";
-            }
-            return "";
-        }
-
-        public void EditName(CustomerAccount account)//editar nombre
-        {
-            string newName;
-            Console.WriteLine("Name Edit");
-            while (true)
+            if (amount <= 0)
             {
-                Console.Write("Enter new name : ");
-                newName = Console.ReadLine();
-                string reply;
-                reply = account.ValidateName(newName);
+                return false;
+            }
+            Balance += amount;
+            Console.WriteLine(Balance);
+            return true;
+        }
 
-                if (reply.Length == 0)
+        public void DoEdit()
+        {
+            string command;
+            decimal amount;
+            BabyBank bbank = new BabyBank();
+            do
+            {
+                Console.WriteLine("Editing account for {0}", Name);
+                Console.WriteLine("    Enter name to edit name");
+                Console.WriteLine("    Enter balance to edit balance");
+                if (GetType() == typeof(BabyAccount))
                 {
-                    break;
+                    Console.WriteLine("    Enter parentname to edit parent name");
                 }
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid name : " + reply);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            account.SetName(newName);
-        }
+                Console.WriteLine("    Enter pay to pay in funds");
+                Console.WriteLine("    Enter draw to draw out funds");
+                Console.WriteLine("    Enter show to see all the account data");
+                Console.WriteLine("    Enter exit to exit program");
+                Console.Write("Enter command : ");
 
-        public void EditBalance(CustomerAccount account)//editar saldo
-        {
-            decimal newBalance;
-            Console.WriteLine("Balance Edit");
-            while (true)
-            {
-                Console.Write("Enter new balance value : ");
-                newBalance = decimal.Parse(Console.ReadLine());
-                string reply;
-                reply = account.ValidateBalance(newBalance);
-
-                if (reply.Length == 0)
+                command = Console.ReadLine();
+                command = command.Trim();
+                command = command.ToLower();
+                switch (command)
                 {
-                    break;
+                    case "name":
+                        Console.Write("Enter new name : ");
+                        Name = Console.ReadLine();
+                        break;
+                    case "balance":
+                        Console.Write("Enter new balance : ");
+                        Balance = decimal.Parse(Console.ReadLine());
+                        break;
+                    case "parentname":
+                        Console.Write("Enter new  parent name : ");
+                        CustomerAccount cbaby = bbank.GenerateAccountFrom("TestB.txt");
+                        var cbabe = (BabyAccount)cbaby;
+                        cbabe.ParentName = Console.ReadLine();
+                        break;
+                    case "pay":
+                        Console.Write("Enter amount : ");
+                        amount = decimal.Parse(Console.ReadLine());
+                        PayInFunds(amount);
+                        break;
+                    case "draw":
+                        Console.Write("Enter amount : ");
+                        amount = decimal.Parse(Console.ReadLine());
+                        WithdrawFunds(amount);
+                        break;
+                    case "show":
+                        Console.WriteLine("Datos de la cuenta {0}", Name);
+                        Console.WriteLine("$ - Balance: {Balance}");
+                        if (GetType() == typeof(BabyAccount))
+                        {
+                            Console.WriteLine("$ - Parent name: {ParentName}");
+                            break;
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("The command inserted isn't valid");
+                        break;
                 }
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid balance : " + reply);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            account.SetBalance(newBalance);
+            } while (command != "exit");
         }
-    }
-    public class BabyAccount : CustomerAccount//cuenta 'baby'
-    {
-        private string parentName;
-
-        public BabyAccount(string newName, decimal initialBalance, string inParentName) : base(newName, initialBalance) {//constructor basado en el de CustomerAccount
-            parentName = inParentName;
-        }
-
-        public bool SetParentName(string Pname)//establecer nombre de la cuenta padre
-        {
-            string reply = ValidateName(Pname);
-            if (reply.Length < 0)
-            {
-                return false;
-            }
-            this.parentName = Pname.Trim();
-            return true;
-        }
-
-        public string GetParentName()//obtener nombre de la cuenta 'padre'
-        {
-            return parentName;
-        }
-
-        public void EditParentName(BabyAccount account)//editar nombre
-        {
-            string newName;
-            Console.WriteLine("Parent Name Edit");
-            while (true)
-            {
-                Console.Write("Enter new parent name : ");
-                newName = Console.ReadLine();
-                string reply;
-                reply = account.ValidateName(newName);
-
-                if (reply.Length == 0)
-                {
-                    break;
-                }
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid name : " + reply);
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            account.SetParentName(newName);
-        }
-
-        public override bool WithdrawFunds(decimal amount)//sacar fondos 'baby'
-        {
-            if (amount > 10)
-            {
-                return false;
-            }
-            return base.WithdrawFunds(amount);
-        }
+        #endregion
     }
 }
+#endregion

@@ -1,118 +1,111 @@
 ﻿using System;
-using BankProyect;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankProyect
+namespace Bank2
 {
-    class Program
+    public class Program
     {
-        public static void Main(string[] args)//testeos
-        {
-            Console.ForegroundColor = ConsoleColor.White;//cambia el color de la letra en la consola
+        public Program() { }
 
+        #region Main
+
+        static void Main(string[] args)
+        {
             Bank ourBank = new Bank();
             BabyBank ourBabyBank = new BabyBank();
 
-            CustomerAccount newAccount = new CustomerAccount("Rob", 1000000);
+            CustomerAccount Acc1 = new CustomerAccount("Rob", 1000000);
+            BabyAccount BabyAcc1 = new BabyAccount("David", 100, "Rob");
+            CustomerAccount Acc2 = new CustomerAccount("Jim", 50);
 
-            if (ourBank.StoreAccount(newAccount))
+            ourBank.SaveAccountOn("Test.txt", Acc1);
+            ourBabyBank.SaveAccountOn("TestB.txt", BabyAcc1);
+
+            StoreTest(ourBank, Acc1);
+            StoreTest(ourBabyBank, BabyAcc1);
+
+            CustomerAccount loadedAcc = ourBank.GenerateAccountFrom("Test.txt");
+            CustomerAccount loadedBabyAcc = ourBabyBank.GenerateAccountFrom("TestB.txt");
+            BabyAccount loadedBabeAcc = (BabyAccount)loadedBabyAcc;
+
+            FindTest(ourBank);
+
+            Testing(BabyAcc1);
+            Testing(Acc2);
+
+            Acc1.DoEdit();
+            BabyAcc1.DoEdit();
+            Acc2.DoEdit();
+
+            Console.ReadLine();
+        }
+
+        public static string StoreTest(Bank bank, CustomerAccount acc)
+        {
+            string mssg = null;
+
+            if (bank.TryStoreAccount(acc))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Account added to bank");
-                Console.ForegroundColor = ConsoleColor.White;
+                mssg = "Account added to bank";
+                Console.WriteLine(mssg);
             }
 
-            BabyAccount newBabyAccount = new BabyAccount("David", 100,"Rob");
+            mssg = "Failed adding the account";
+            Console.WriteLine(mssg);
+            return mssg;
+        }
 
-            if (ourBank.StoreAccount(newBabyAccount))
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("BabyAccount added to bank");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
+        #endregion
+        #region Testing
 
-            ourBank.Save("Test.txt", newAccount);
-            ourBabyBank.Save("TestB.txt", newBabyAccount);
+        public static string FindTest(Bank bank)
+        {
+            string mssg = null;
 
-            CustomerAccount loadAcc = ourBank.Load("Test.txt");
-            BabyAccount loadBabyAcc = ourBabyBank.babyLoad("TestB.txt");
-
-            IAccount storedAccount = ourBank.FindAccount("Rob");
+            IAccount storedAccount = bank.TryFindAccount("Rob");
             if (storedAccount != null)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Account found in bank");
-                Console.ForegroundColor = ConsoleColor.White;
+                mssg = "Account found in bank";
+                Console.WriteLine(mssg);
             }
 
-            IAccount storedBabyAccount = ourBank.FindAccount("David");
+            IAccount storedBabyAccount = bank.TryFindAccount("David");
             if (storedBabyAccount != null)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("BabyAccount found in bank");
-                Console.ForegroundColor = ConsoleColor.White;
+                mssg = "BabyAccount found in bank";
+                Console.WriteLine(mssg);
             }
 
-
-            //----------------------------
-
-            int errorCount = 0;
-        
-            string reply = loadAcc.ValidateName(null);
-
-            if (reply != "Name parameter null")
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Null name test failed");
-                Console.ForegroundColor = ConsoleColor.White;
-                errorCount++;
-            }
-
-            reply = loadAcc.ValidateName("");
-            if (reply != "No text in the name")
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Empty name test failed");
-                Console.ForegroundColor = ConsoleColor.White;
-                errorCount++;
-            }
-
-            CustomerAccount a = new CustomerAccount("Jim", 50);
-
-            if (a.GetName() != "Jim")
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Jim GetName failed");
-                Console.ForegroundColor = ConsoleColor.White;
-                errorCount++;
-            }
-
-            if (errorCount > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("There are "+errorCount+" errors");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("There are " + errorCount + " errors");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-
-            //----------------------------transferq 
-
-            ourBank.Transfer(loadAcc,loadBabyAcc);
-
-            //----------------------------
-            ourBank.DoEdit(a);
-            ourBank.DoEdit(loadAcc);
-            ourBank.DoEdit(loadBabyAcc);
-
-            Console.ReadLine();//evita desaparicion de la consola
+            mssg = "Failed finding the account";
+            Console.WriteLine(mssg);
+            return mssg;
         }
+
+        public static string Testing(CustomerAccount acc)
+        {
+            int errorCount = 0;
+            string mssg = null;
+            string reply = (acc.IsValidName()).ToString();
+
+            if (reply == "false")
+            {
+                Console.WriteLine("Name test failed");
+                errorCount++;
+            }
+
+            if (acc.Name != "Jim")
+            {
+                Console.WriteLine("Jim GetName failed");
+                errorCount++;
+            }
+
+            mssg = "There are " + errorCount + " errors";
+            Console.WriteLine(mssg);
+            return mssg;
+        }
+        #endregion
     }
 }
