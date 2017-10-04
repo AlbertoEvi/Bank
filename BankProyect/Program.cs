@@ -38,8 +38,8 @@ namespace Bank2
             BabyAcc1 = new BabyAccount("David", 100, "Rob");
             Acc2 = new CustomerAccount("Jim", 50);
 
-            ourBank.SaveAccountOn("Test.txt", Acc1);
-            ourBabyBank.SaveAccountOn("TestB.txt", BabyAcc1);
+            Acc1.SaveAccountOn("Test.txt", Acc1);
+            BabyAcc1.SaveAccountOn("TestB.txt", BabyAcc1);
 
             StoreTest(ourBank, Acc1);
             StoreTest(ourBabyBank, BabyAcc1);
@@ -198,7 +198,16 @@ namespace Bank2
         public static void BalanceCase(CustomerAccount acc)
         {
             Console.Write("Enter new balance : ");
-            acc.Balance = decimal.Parse(Console.ReadLine());
+            string bal = Console.ReadLine();
+            decimal balan;
+            if (Decimal.TryParse(bal, out balan))
+            {
+                Console.WriteLine("Converted '{0}' to {1}.", bal, balan);
+                acc.Balance = decimal.Parse(bal);
+            }
+            else
+                Console.WriteLine("Unable to convert '{0}'.", bal);
+            Console.WriteLine("New balance : {0}",acc.Balance);
         }
         public static void ParentNameCase(CustomerAccount acc, BabyBank bbank)
         {

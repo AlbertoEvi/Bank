@@ -16,9 +16,6 @@ namespace Bank2
         bool TryStoreAccount(CustomerAccount account);
         bool TryRemoveAccount(CustomerAccount account);
 
-        void WriteLinesOnFile(StreamWriter textOut, CustomerAccount account);
-        bool SaveAccountOn(string fileName, CustomerAccount account);
-
         void Transfer(CustomerAccount acc1, CustomerAccount acc2, decimal transf);
     }
 
@@ -63,36 +60,7 @@ namespace Bank2
             Console.WriteLine("The account isn't listed");
             return false;
         }
-
-        #region SubFunctions 
-
-
-        public virtual void WriteLinesOnFile(StreamWriter textOut, CustomerAccount account)
-        {
-            textOut.WriteLine(account.Name);
-            textOut.WriteLine(account.Balance);
-        }
-
-        #endregion
-
-        public virtual bool SaveAccountOn(string fileName, CustomerAccount account)
-        {
-            using (StreamWriter textOut = new StreamWriter(fileName))
-            {
-                try
-                {
-                    WriteLinesOnFile(textOut, account);
-                    textOut.Close();
-                    Console.WriteLine("Save failed");
-                }
-                catch (ArgumentNullException ex)
-                {
-                    throw ex;
-                }
-                return true;
-            }
-        }
-
+        
         public void Transfer(CustomerAccount acc1, CustomerAccount acc2, decimal transf)
         {
             if (acc1.Balance < transf) { 

@@ -12,14 +12,7 @@ namespace Bank2
     public class BabyBank : Bank
     {
         #region InheritedMethodsForAccounts
-        public override void WriteLinesOnFile(StreamWriter textOut, CustomerAccount account)
-        {
-            if (account.GetType() != typeof(BabyAccount))
-                throw new ArgumentException(nameof(account));
-
-            base.WriteLinesOnFile(textOut, account);
-            textOut.WriteLine(((BabyAccount)account).ParentName);
-        }
+        
         #endregion
     }
     #endregion

@@ -18,7 +18,9 @@ namespace Bank2
         bool TryWithdrawFunds(decimal amount);
 
         CustomerAccount GenerateAccountFrom(string filename);
-            
+        void WriteLinesOnFile(StreamWriter textOut, CustomerAccount account);
+        bool SaveAccountOn(string fileName, CustomerAccount account);
+
     }
     #endregion
     #region AccountsStuff
@@ -149,6 +151,35 @@ namespace Bank2
                 }
 
                 return result;
+            }
+        }
+
+        #region SubFunctions 
+
+
+        public virtual void WriteLinesOnFile(StreamWriter textOut, CustomerAccount account)
+        {
+            textOut.WriteLine(account.Name);
+            textOut.WriteLine(account.Balance);
+        }
+
+        #endregion
+
+        public virtual bool SaveAccountOn(string fileName, CustomerAccount account)
+        {
+            using (StreamWriter textOut = new StreamWriter(fileName))
+            {
+                try
+                {
+                    WriteLinesOnFile(textOut, account);
+                    textOut.Close();
+                    Console.WriteLine("Save failed");
+                }
+                catch (ArgumentNullException ex)
+                {
+                    throw ex;
+                }
+                return true;
             }
         }
 
