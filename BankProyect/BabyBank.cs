@@ -8,6 +8,7 @@ using System.IO;
 
 namespace Bank2
 {
+    #region BabyBankStuff
     public class BabyBank : Bank
     {
         #region InheritedMethodsForAccounts
@@ -53,4 +54,5 @@ namespace Bank2
         }
         #endregion
     }
+    #endregion
 }

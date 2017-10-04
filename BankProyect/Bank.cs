@@ -25,7 +25,7 @@ namespace Bank2
     }
 
     #endregion
-
+    #region BankStuff
     public class Bank : IBank
     {
         Dictionary<string, IAccount> accountDictionary = new Dictionary<string, IAccount>();
@@ -41,14 +41,17 @@ namespace Bank2
 
         public bool TryStoreAccount(CustomerAccount account)
         {
-            if (accountDictionary.ContainsKey(account.Name))
+            lock (this)
             {
-                Console.WriteLine("Account it's stored yet");
-                return false;
+                if (accountDictionary.ContainsKey(account.Name))
+                {
+                    Console.WriteLine("Account it's stored yet");
+                    return false;
+                }
+                accountDictionary.Add(account.Name, account);
+                Console.WriteLine("Account added correctly");
+                return true;
             }
-            accountDictionary.Add(account.Name, account);
-            Console.WriteLine("Account added correctly");
-            return true;
         }
 
         public bool TryRemoveAccount(CustomerAccount account)
@@ -143,4 +146,5 @@ namespace Bank2
         }
         #endregion
     }
+    #endregion
 }
