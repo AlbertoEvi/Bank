@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,10 +16,12 @@ namespace Bank2
 
         bool TryPayInFunds(decimal amount);
         bool TryWithdrawFunds(decimal amount);
-        
+
+        CustomerAccount GenerateAccountFrom(string filename);
+            
     }
     #endregion
-    #region Accounts
+    #region AccountsStuff
 
     public class CustomerAccount : IAccount
     {
@@ -41,15 +44,13 @@ namespace Bank2
         {
             set
             {
-                var name = this._name;
-                this._name = value;
                 if (!IsValidName())
                 {
-                    this._name = name;
-                    Console.WriteLine("Name not valid");
+                    Console.WriteLine("Name invalid");
+                    return;
                 }
-                else
-                    this._name = value;
+
+                this._name = value;
             }
             get
             {
@@ -61,15 +62,13 @@ namespace Bank2
         {
             set
             {
-                var balance = this._balance;
-                this._balance = value;
-                if (!IsValidName())
+                if (!IsValidBalance())
                 {
-                    this._balance = balance;
-                    Console.WriteLine("Balance not valid");
+                    Console.WriteLine("Balance invalid");
+                    return;
                 }
-                else
-                    this._balance = value;
+
+                this._balance = value;
             }
             get
             {
@@ -114,14 +113,45 @@ namespace Bank2
 
         public bool TryPayInFunds(decimal amount)
         {
-            if (amount <= 0)
-            {
-                return false;
-            }
-            Balance += amount;
+            bool IsAmountPositive = amount > 0;
+            if (IsAmountPositive)
+                Balance += amount;
             Console.WriteLine(Balance);
-            return true;
+            return IsAmountPositive;
         }
+        #endregion
+
+        #region AccountsMethods
+
+        public virtual CustomerAccount GenerateAccountFrom(string filename)
+        {
+            CustomerAccount result = null;
+            using (StreamReader textIn = new StreamReader(filename))
+            {
+                try
+                {
+                    string nameText = textIn.ReadLine();
+
+                    string balanceText = textIn.ReadLine();
+                    decimal balance = decimal.Parse(balanceText);
+
+                    Console.WriteLine(nameText);
+                    Console.WriteLine(balance);
+
+                    result = new CustomerAccount(nameText, balance);
+
+                    textIn.Close();
+                    Console.WriteLine("File loaded correctly");
+                }
+                catch (ArgumentNullException ex)
+                {
+                    throw ex;
+                }
+
+                return result;
+            }
+        }
+
         #endregion
     }
 }

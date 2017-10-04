@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bank2
 {
-    #region BabyAccStuff
+    #region BabyAccountStuff
     public class BabyAccount : CustomerAccount
     {
         private string _parentName;
@@ -26,15 +27,13 @@ namespace Bank2
         {
             set
             {
-                var pName = this._parentName;
-                this._parentName = value;
                 if (!IsValidParentName())
                 {
-                    this._parentName = pName;
-                    Console.WriteLine("Parent name not valid");
+                    Console.WriteLine("Name invalid");
+                    return;
                 }
-                else
-                    this._parentName = value;
+
+                this._parentName = value;
             }
             get
             {
@@ -67,6 +66,41 @@ namespace Bank2
             return base.TryWithdrawFunds(amount);
         }
 
+        #endregion
+
+        #region AccountsMethods
+
+        public override CustomerAccount GenerateAccountFrom(string filename)
+        {
+            BabyAccount result = null;
+            using (StreamReader textIn = new StreamReader(filename))
+            {
+                try
+                {
+
+                    string nameText = textIn.ReadLine();
+
+                    string balanceText = textIn.ReadLine();
+                    decimal balance = decimal.Parse(balanceText);
+
+                    string parent = textIn.ReadLine();
+
+                    Console.WriteLine("Name: {0}", nameText);
+                    Console.WriteLine("Balance: {0}", balance);
+                    Console.WriteLine("Parent Name: {0}", parent);
+
+                    result = new BabyAccount(nameText, balance, parent);
+
+                    textIn.Close();
+                    Console.WriteLine("File loaded correctly");
+                }
+                catch (ArgumentNullException ex)
+                {
+                    throw ex;
+                }
+                return result;
+            }
+        }
         #endregion
     }
     #endregion

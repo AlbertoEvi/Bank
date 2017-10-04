@@ -19,9 +19,7 @@ namespace Bank2
         void WriteLinesOnFile(StreamWriter textOut, CustomerAccount account);
         bool SaveAccountOn(string fileName, CustomerAccount account);
 
-        CustomerAccount GenerateAccountFrom(string filename);
-
-        void Transfer(CustomerAccount acc1, CustomerAccount acc2);
+        void Transfer(CustomerAccount acc1, CustomerAccount acc2, decimal transf);
     }
 
     #endregion
@@ -95,42 +93,12 @@ namespace Bank2
             }
         }
 
-        public virtual CustomerAccount GenerateAccountFrom(string filename)
+        public void Transfer(CustomerAccount acc1, CustomerAccount acc2, decimal transf)
         {
-            CustomerAccount result = null;
-            using (StreamReader textIn = new StreamReader(filename))
-            {
-                try
-                {
-                    string nameText = textIn.ReadLine();
-
-                    string balanceText = textIn.ReadLine();
-                    decimal balance = decimal.Parse(balanceText);
-
-                    Console.WriteLine(nameText);
-                    Console.WriteLine(balance);
-
-                    result = new CustomerAccount(nameText, balance);
-
-                    textIn.Close();
-                    Console.WriteLine("File loaded correctly");
-                }
-                catch
-                {
-                    throw new ArgumentNullException();
-                }
-
-                return result;
-            }
-        }
-
-        public void Transfer(CustomerAccount acc1, CustomerAccount acc2)
-        {
-            Console.WriteLine("Enter the amount to transfer: ");
-            decimal transf = decimal.Parse(Console.ReadLine());
-
-            if (acc1.Balance < transf)
+            if (acc1.Balance < transf) { 
                 Console.WriteLine("Not enough funds to make the transference");
+                return;
+            }
 
             acc1.TryWithdrawFunds(transf);
 

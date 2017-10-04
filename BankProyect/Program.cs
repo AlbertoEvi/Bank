@@ -6,16 +6,19 @@ using System.Threading.Tasks;
 
 namespace Bank2
 {
+    #region Program
     public class Program
     {
         #region GlobalVars
 
-        private static Bank ourBank;
-        private static BabyBank ourBabyBank = new BabyBank();
+        private static decimal amount;
 
-        private static CustomerAccount Acc1 = new CustomerAccount("Rob", 1000000);
-        private static BabyAccount BabyAcc1 = new BabyAccount("David", 100, "Rob");
-        private static CustomerAccount Acc2 = new CustomerAccount("Jim", 50);
+        private static Bank ourBank;
+        private static BabyBank ourBabyBank;
+
+        private static CustomerAccount Acc1;
+        private static BabyAccount BabyAcc1;
+        private static CustomerAccount Acc2;
 
         #endregion
 
@@ -30,14 +33,19 @@ namespace Bank2
         public static void Main(string[] args)
         {
             ourBank = new Bank();
+            ourBabyBank = new BabyBank();
+            Acc1 = new CustomerAccount("Rob", 1000000);
+            BabyAcc1 = new BabyAccount("David", 100, "Rob");
+            Acc2 = new CustomerAccount("Jim", 50);
+
             ourBank.SaveAccountOn("Test.txt", Acc1);
             ourBabyBank.SaveAccountOn("TestB.txt", BabyAcc1);
 
             StoreTest(ourBank, Acc1);
             StoreTest(ourBabyBank, BabyAcc1);
 
-            CustomerAccount loadedAcc = ourBank.GenerateAccountFrom("Test.txt");
-            CustomerAccount loadedBabyAcc = ourBabyBank.GenerateAccountFrom("TestB.txt");
+            CustomerAccount loadedAcc = Acc1.GenerateAccountFrom("Test.txt");
+            CustomerAccount loadedBabyAcc = BabyAcc1.GenerateAccountFrom("TestB.txt");
             BabyAccount loadedBabeAcc = (BabyAccount)loadedBabyAcc;
 
             FindTest(ourBank);
@@ -45,11 +53,27 @@ namespace Bank2
             Testing(BabyAcc1);
             Testing(Acc2);
 
+            amount = 30;
+            Transfer(Acc1,Acc2,amount,ourBank);
+            
             DoEdit(Acc1);
             DoEdit(BabyAcc1);
             DoEdit(Acc2);
 
             Console.ReadLine();
+        }
+
+        #endregion
+
+        #region Testing
+
+        public static string Transfer(CustomerAccount acc1, CustomerAccount acc2, decimal transfer, Bank bank)
+        {
+            string mssg = null;
+            bank.Transfer(acc1, acc2, transfer);
+            mssg = "Transference done correctly";
+            Console.WriteLine(mssg);
+            return mssg;
         }
 
         public static string StoreTest(Bank bank, CustomerAccount acc)
@@ -66,9 +90,6 @@ namespace Bank2
             Console.WriteLine(mssg);
             return mssg;
         }
-
-        #endregion
-        #region Testing
 
         public static string FindTest(Bank bank)
         {
@@ -182,7 +203,7 @@ namespace Bank2
         public static void ParentNameCase(CustomerAccount acc, BabyBank bbank)
         {
             Console.Write("Account data : ");
-            CustomerAccount cbaby = bbank.GenerateAccountFrom("TestB.txt");
+            CustomerAccount cbaby = acc.GenerateAccountFrom("TestB.txt");
             var cbabe = (BabyAccount)cbaby;
             Console.Write("Enter new  parent name : ");
             cbabe.ParentName = Console.ReadLine();
@@ -211,4 +232,5 @@ namespace Bank2
         }
         #endregion
     }
+    #endregion
 }
