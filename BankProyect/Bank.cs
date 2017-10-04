@@ -36,8 +36,7 @@ namespace Bank2
         {
             if (accountDictionary.ContainsKey(name))
                 return accountDictionary[name];
-
-            throw new ArgumentException("Account not finded on our register");
+            return null;
         }
 
         public bool TryStoreAccount(CustomerAccount account)
@@ -85,9 +84,9 @@ namespace Bank2
                     textOut.Close();
                     Console.WriteLine("Save failed");
                 }
-                catch
+                catch (ArgumentNullException ex)
                 {
-                    throw new ArgumentNullException();
+                    throw ex;
                 }
                 return true;
             }
@@ -96,29 +95,30 @@ namespace Bank2
         public virtual CustomerAccount GenerateAccountFrom(string filename)
         {
             CustomerAccount result = null;
-            TextReader textIn = null;
-            try
+            using (StreamReader textIn = new StreamReader(filename))
             {
-                textIn = new StreamReader(filename);
-                string nameText = textIn.ReadLine();
+                try
+                {
+                    string nameText = textIn.ReadLine();
 
-                string balanceText = textIn.ReadLine();
-                decimal balance = decimal.Parse(balanceText);
+                    string balanceText = textIn.ReadLine();
+                    decimal balance = decimal.Parse(balanceText);
 
-                Console.WriteLine(nameText);
-                Console.WriteLine(balance);
+                    Console.WriteLine(nameText);
+                    Console.WriteLine(balance);
 
-                result = new CustomerAccount(nameText, balance);
+                    result = new CustomerAccount(nameText, balance);
 
-                textIn.Close();
-                Console.WriteLine("File loaded correctly");
+                    textIn.Close();
+                    Console.WriteLine("File loaded correctly");
+                }
+                catch
+                {
+                    throw new ArgumentNullException();
+                }
+
+                return result;
             }
-            catch
-            {
-                throw new ArgumentNullException();
-            }
-
-            return result;
         }
 
         public void Transfer(CustomerAccount acc1, CustomerAccount acc2)
@@ -129,14 +129,14 @@ namespace Bank2
             if (acc1.Balance < transf)
                 Console.WriteLine("Not enough funds to make the transference");
 
-            acc1.WithdrawFunds(transf);
+            acc1.TryWithdrawFunds(transf);
 
-            if (acc1.WithdrawFunds(transf) == true)
+            if (acc1.TryWithdrawFunds(transf) == true)
             {
-                acc2.PayInFunds(transf);
+                acc2.TryPayInFunds(transf);
 
-                if (acc2.PayInFunds(transf) == false)
-                    acc1.PayInFunds(transf);
+                if (acc2.TryPayInFunds(transf) == false)
+                    acc1.TryPayInFunds(transf);
 
                 Console.WriteLine("Tranference done correctly");
             }

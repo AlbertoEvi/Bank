@@ -10,7 +10,7 @@ namespace Bank2
     {
         private string _parentName;
 
-        #region ConstructorInherited
+        #region .CtorInherited
 
         public BabyAccount(string newName, decimal initialBalance, string inParentName) : base(newName, initialBalance)
         {
@@ -25,7 +25,14 @@ namespace Bank2
         {
             set
             {
-                if (IsValidParentName())
+                var pName = this._parentName;
+                this._parentName = value;
+                if (!IsValidParentName())
+                {
+                    this._parentName = pName;
+                    Console.WriteLine("Parent name not valid");
+                }
+                else
                     this._parentName = value;
             }
             get
@@ -50,13 +57,13 @@ namespace Bank2
 
         #region BalanceOperations
 
-        public override bool WithdrawFunds(decimal amount)
+        public override bool TryWithdrawFunds(decimal amount)
         {
             if (amount > 10)
             {
                 return false;
             }
-            return base.WithdrawFunds(amount);
+            return base.TryWithdrawFunds(amount);
         }
 
         #endregion

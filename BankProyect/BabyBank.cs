@@ -27,9 +27,9 @@ namespace Bank2
 
                 string parent = textIn.ReadLine();
 
-                Console.WriteLine(nameText);
-                Console.WriteLine(balance);
-                Console.WriteLine(parent);
+                Console.WriteLine("Name: {0}",nameText);
+                Console.WriteLine("Balance: {0}", balance);
+                Console.WriteLine("Parent Name: {0}", parent);
 
                 result = new BabyAccount(nameText, balance, parent);
 
